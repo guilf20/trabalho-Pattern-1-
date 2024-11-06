@@ -1,0 +1,228 @@
+interface SUV {
+    String getDescription();
+}
+
+interface Sedan {
+    String getDescription();
+}
+
+class ToyotaSUV implements SUV {
+    @Override
+    public String getDescription() {
+        return "Toyota SUV - Robusto e confiável para todo terreno.";
+    }
+}
+
+class ToyotaSedan implements Sedan {
+    @Override
+    public String getDescription() {
+        return "Toyota Sedan - Confortável e econômico para a cidade.";
+    }
+}
+
+class FordSUV implements SUV {
+    @Override
+    public String getDescription() {
+        return "Ford SUV - Potente e espaçoso para aventuras.";
+    }
+}
+
+class FordSedan implements Sedan {
+    @Override
+    public String getDescription() {
+        return "Ford Sedan - Elegante e prático para o dia a dia.";
+    }
+}
+
+interface CarFactory {
+    SUV createSUV();
+    Sedan createSedan();
+}
+
+class ToyotaFactory implements CarFactory {
+    @Override
+    public SUV createSUV() {
+        return new ToyotaSUV();
+    }
+
+    @Override
+    public Sedan createSedan() {
+        return new ToyotaSedan();
+    }
+}
+
+class FordFactory implements CarFactory {
+    @Override
+    public SUV createSUV() {
+        return new FordSUV();
+    }
+
+    @Override
+    public Sedan createSedan() {
+        return new FordSedan();
+    }
+}
+
+public class CarSalesClient {
+    private final SUV suv;
+    private final Sedan sedan;
+
+    public CarSalesClient(CarFactory factory) {
+        suv = factory.createSUV();
+        sedan = factory.createSedan();
+    }
+
+    public void showInventory() {
+        System.out.println(suv.getDescription());
+        System.out.println(sedan.getDescription());
+    }
+
+    public static void main(String[] args) {
+        System.out.println("Inventário Toyota:");
+        CarSalesClient toyotaClient = new CarSalesClient(new ToyotaFactory());
+        toyotaClient.showInventory();
+
+        System.out.println("\nInventário Ford:");
+        CarSalesClient fordClient = new CarSalesClient(new FordFactory());
+        fordClient.showInventory();
+    }
+}
+public abstract class Carro {
+    public abstract void mostrarDetalhes();
+    public abstract double calcularPreco();
+}
+
+public class CarroIndividual extends Carro {
+    private String modelo;
+    private double preco;
+
+    public CarroIndividual(String modelo, double preco) {
+        this.modelo = modelo;
+        this.preco = preco;
+    }
+
+    @Override
+    public void mostrarDetalhes() {
+        System.out.println("Modelo: " + modelo + ", Preço: R$ " + preco);
+    }
+
+    @Override
+    public double calcularPreco() {
+        return preco;
+    }
+}
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class PacoteDeCarros extends Carro {
+    private List<Carro> carros = new ArrayList<>();
+
+    public void adicionarCarro(Carro carro) {
+        carros.add(carro);
+    }
+
+    public void removerCarro(Carro carro) {
+        carros.remove(carro);
+    }
+
+    @Override
+    public void mostrarDetalhes() {
+        System.out.println("Pacote de Carros:");
+        for (Carro carro : carros) {
+            carro.mostrarDetalhes();
+        }
+    }
+
+    @Override
+    public double calcularPreco() {
+        double total = 0;
+        for (Carro carro : carros) {
+            total += carro.calcularPreco();
+        }
+        return total;
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Carro carro1 = new CarroIndividual("Fusca", 25000.00);
+        Carro carro2 = new CarroIndividual("Civic", 90000.00);
+        Carro carro3 = new CarroIndividual("Gol", 30000.00);
+
+        PacoteDeCarros pacote1 = new PacoteDeCarros();
+        pacote1.adicionarCarro(carro1);
+        pacote1.adicionarCarro(carro2);
+
+        PacoteDeCarros pacote2 = new PacoteDeCarros();
+        pacote2.adicionarCarro(carro3);
+        pacote2.adicionarCarro(pacote1);
+
+        System.out.println("Detalhes e Preço do Pacote 2:");
+        pacote2.mostrarDetalhes();
+        System.out.println("Preço Total do Pacote 2: R$ " + pacote2.calcularPreco());
+
+        System.out.println("\nDetalhes e Preço do Pacote 1:");
+        pacote1.mostrarDetalhes();
+        System.out.println("Preço Total do Pacote 1: R$ " + pacote1.calcularPreco());
+    }
+}
+import java.util.ArrayList;
+import java.util.List;
+
+interface Observador {
+    void atualizar(String carro);
+}
+
+class Concessionaria {
+    private List<Observador> observadores = new ArrayList<>();
+    private String carroDisponivel;
+
+    public void adicionarObservador(Observador observador) {
+        observadores.add(observador);
+    }
+
+    public void removerObservador(Observador observador) {
+        observadores.remove(observador);
+    }
+
+    public void setCarroDisponivel(String novoCarro) {
+        System.out.println("\nNovo carro disponível: " + novoCarro);
+        this.carroDisponivel = novoCarro;
+        notificarObservadores();
+    }
+
+    private void notificarObservadores() {
+        for (Observador observador : observadores) {
+            observador.atualizar(carroDisponivel);
+        }
+    }
+}
+
+class Cliente implements Observador {
+    private String nome;
+
+    public Cliente(String nome) {
+        this.nome = nome;
+    }
+
+    @Override
+    public void atualizar(String carro) {
+        System.out.println(nome + " foi notificado: Novo carro disponível para venda - " + carro);
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Concessionaria concessionaria = new Concessionaria();
+
+        Cliente cliente1 = new Cliente("Cliente 1");
+        Cliente cliente2 = new Cliente("Cliente 2");
+
+        concessionaria.adicionarObservador(cliente1);
+        concessionaria.adicionarObservador(cliente2);
+
+        concessionaria.setCarroDisponivel("Toyota Corolla");
+        concessionaria.setCarroDisponivel("Honda Civic");
+    }
+}
